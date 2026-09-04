@@ -1,0 +1,99 @@
+npm init -y
+npm i express mongoose dotenv jsonwebtoken cookie-parser
+
+
+
+Password Hashing md5 website for hashing generator
+hashing me plane text se hashing bna sakte ho lekin hash se same text nhi bna sakte 
+same input se same hi hash ayega 
+
+Hashing perform krne ke lie package install krna hota hai = npm i bcryptjs
+
+
+music store krne ke lie image kit package install krna padega  = npm install @imagekit/nodejs
+image kit src me services folder me storage.service.js
+
+
+
+
+            #old music controllers
+
+  //yha only artist music create kr sake user nhi , logic
+
+const musicModel=require('../models/music.model');
+const {uploadFile} = require("../services/storage.services");
+const albumModel=require("../models/album.model");
+
+
+async function createMusic(req,res) {
+
+    try{
+    const {title} =req.body;
+
+    if(!req.file){
+        return res.status(400).json({message:"Music file is required"})
+    }
+
+    const result =await uploadFile(req.file.buffer.toString('base64'))
+
+    const music = await musicModel.create({
+        uri:result.url,
+        title,
+        artist:req.user.id,
+    })
+
+    res.status(201).json({
+        message:"Music created sucessfully",
+        music:{
+            id:music._id,
+            uri:music.uri,
+            title:music.title,
+            artist:music.artist,
+        }
+    })
+   
+    
+}catch(err){
+    console.log(err);
+        return res.status(500).json({message:"Music upload failed"})
+    }
+}
+
+async function createAlbum(req,res) {
+
+    try {
+     const {title,musics} = req.body;
+      const album =await albumModel.create({
+        title,
+        artist:req.user.id,
+        musics:musics,
+      })
+ 
+      res.status(201).json({
+        message:"Album created sucessfully",
+        album:{
+            id:album._id,
+            title:album.title,
+            artist:album.artist,
+            musics:album.musics,
+        }
+      })
+
+
+
+
+    }catch(err){
+        console.log(err);
+        return res.status(401).json({message:"Unauthorized"})
+    }
+}
+
+module.exports={createMusic,createAlbum}
+
+
+
+
+#Token blacklisting padh lena
+        
+
+#testing ke lie jest install krte hai = npm i jest supertest 
